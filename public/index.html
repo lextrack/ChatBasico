@@ -1,89 +1,215 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="Aplicación de mensajeria sin el zucaritas">
+    <meta name="author" content="Lextrack">
+    <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://www.gstatic.com https://*.firebaseio.com https://cdn.firebase.com https://apis.google.com https://cdnjs.cloudflare.com;
+    style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline';
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:;
+    img-src 'self' data: https://*.firebaseio.com;
+    connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.googleapis.com;
+    frame-src 'self' https://*.firebaseio.com https://*.firebase.com;
+    object-src 'none';">
+    <title>WhatSapo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="icon" href="img/favicon.ico" />
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Pantalla de autenticación -->
+        <div id="auth-screen" class="auth-screen">
+            <div class="auth-card">
+                <h1>WhatSapo</h1>
+                <div class="auth-tabs">
+                    <button id="login-tab" class="active">Iniciar sesión</button>
+                    <button id="register-tab">Registrarse</button>
+                </div>
+                
+                <!-- Formulario de inicio de sesión -->
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Correo electrónico</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Contraseña</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Iniciar sesión</button>
+                    <p id="login-error" class="error-message"></p>
+                </form>
+                
+                <!-- Formulario de registro -->
+                <form id="register-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="register-name">Nombre de usuario</label>
+                        <input type="text" id="register-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Correo electrónico</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Contraseña</label>
+                        <input type="password" id="register-password" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary">Registrarse</button>
+                    <p id="register-error" class="error-message"></p>
+                </form>
+            </div>
+        </div>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/11.5.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/11.5.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+        <!-- Pantalla principal de chat -->
+        <div id="chat-screen" class="chat-screen" style="display: none;">
+            <!-- Overlay para sidebar en móviles -->
+            <div id="sidebar-overlay" class="sidebar-overlay"></div>
+            
+            <!-- Sidebar con navegación y lista de chats -->
+            <div class="sidebar">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span id="user-initial"></span>
+                    </div>
+                    <div class="user-info">
+                        <h3 id="user-name"></h3>
+                        <p id="user-email"></p>
+                    </div>
+                    <button id="logout-btn" class="btn-icon">
+                        <i class="fas fa-sign-out"></i>
+                    </button>
+                </div>
+                
+                <div class="sidebar-title">
+                    <h2>Conversaciones</h2>
+                    <button id="new-chat-btn" class="btn-icon">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <div id="chat-list" class="chat-list">
+                    <!-- Las conversaciones se cargarán aquí -->
+                </div>
+            </div>
+            
+            <!-- Área principal de chat -->
+            <div class="chat-area">
+                <!-- Cabecera del chat con botón de menú para móviles -->
+                <div class="chat-header">
+                    <button id="menu-toggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 id="current-chat-name">Selecciona una conversación</h2>
+                    <div class="chat-actions">
+                    </div>
+                </div>
+                
+                <!-- Contenedor de mensajes -->
+                <div id="messages-container" class="messages-container">
+                    <div class="no-chat-selected">
+                        <p>Selecciona una conversación para comenzar a chatear</p>
+                    </div>
+                    <!-- Los mensajes se cargarán aquí -->
+                </div>
+                
+                <!-- Formulario para enviar mensajes -->
+                <form id="message-form" class="message-form">
+                    <div class="message-input-wrapper">
+                      <input type="text" id="message-input" placeholder="Escribe un mensaje..." disabled>
+                    </div>
+                    <button type="submit" class="btn-send" disabled>Enviar</button>
+                </form>
+            </div>
+            
+            <!-- Modal para nueva conversación -->
+            <div id="new-chat-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Nueva conversación</h2>
+                    <form id="new-chat-form">
+                        <div class="form-group">
+                            <label for="chat-name">Nombre de la conversación</label>
+                            <input type="text" id="chat-name" placeholder="Ingresa un nombre para la conversación" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Selecciona participantes</label>
+                            <div id="user-selection" class="user-selection-container">
+                                <!-- Los usuarios se cargarán aquí -->
+                                <div class="loading-users">Cargando usuarios disponibles...</div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary"> Crear conversación</button>
+                    </form>
+                </div>
+            </div>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+            <!-- Modal de información del chat -->
+            <div id="chat-info-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Información del chat</h2>
+                        <span class="close">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="chat-info-section">
+                            <h3 id="info-chat-name">Nombre del chat</h3>
+                            
+                            <div class="info-row">
+                                <span class="info-label">Fecha de creación:</span>
+                                <span id="info-chat-date">Cargando...</span>
+                            </div>
+                            
+                            <div class="info-row">
+                                <span class="info-label" id="creator-label">Creado por:</span>
+                                <span id="info-chat-creator">Cargando...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-info-section">
+                            <h3>Participantes</h3>
+                            <ul id="participants-list">
+                                <li class="loading-item">Cargando participantes...</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="chat-info-section add-user-section">
+                            <h3>Añadir participantes</h3>
+                            <form id="add-user-form">
+                                <div id="add-user-selection">
+                                    <p class="loading-text">Cargando usuarios disponibles...</p>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Añadir usuarios</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Botón para salir del chat -->
+                        <div class="chat-info-section leave-section">
+                            <button id="leave-chat-btn" class="btn btn-danger">Salir del chat</button>
+                            <p class="leave-note">Al salir, no recibirás más mensajes de esta conversación</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
-  </body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/crypto-utils.js"></script>
+    <script src="js/responsive.js"></script>
+    <script src="js/chat-import.js"></script>
+    <script src="js/back-button-handler.js"></script>
+    <script src="js/app.js"></script>
+</body>
 </html>
