@@ -594,13 +594,6 @@ function setupChatPullToRefresh() {
     
     function safelyReloadPage() {
         try {
-            window.isManualRefresh = true;
-            
-            if (window.onbeforeunload) {
-                const originalBeforeUnload = window.onbeforeunload;
-                window.onbeforeunload = null;
-            }
-            
             if (typeof cleanupEverything === 'function') {
                 try {
                     cleanupEverything();
@@ -609,35 +602,19 @@ function setupChatPullToRefresh() {
                 }
             }
             
-            if (typeof handleBeforeUnload === 'function') {
-                window.removeEventListener('beforeunload', handleBeforeUnload);
-            }
-            
-            const noOp = function() {};
-            window.addEventListener('beforeunload', noOp, { capture: true, once: true });
-
-            const scrollPos = window.scrollY;
+            refreshIndicator.classList.add('refreshing');
+            refreshIndicator.querySelector('.refresh-text').textContent = 'Actualizando...';
             
             setTimeout(() => {
                 try {
-                    const currentUrl = window.location.href.split('#')[0];
-                    const timeStamp = Date.now();
-                    
-                    if (window.navigation && typeof window.navigation.reload === 'function') {
-                        window.navigation.reload();
-                    } else {
-                        window.location.href = currentUrl + `#refresh_${timeStamp}`;
-                        window.location.reload(true);
-                    }
+                    window.location.reload(true);
                 } catch (error) {
-                    console.error('Error en recarga primaria:', error);
-                    
+                    console.error('Error en recarga:', error);
                     window.location.reload();
                 }
             }, 700);
         } catch (error) {
             console.error('Error general en recarga:', error);
-            resetPullState();
             setTimeout(() => window.location.reload(), 1000);
         }
     }

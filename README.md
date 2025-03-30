@@ -19,7 +19,6 @@ La aplicación sigue una arquitectura modular donde cada componente se encarga d
 │   ├── chat-encryption.js      # Integración con el sistema de cifrado
 │   ├── chat-firebase.js        # Interacción con Firebase
 │   ├── chat-import.js          # Gestor de importación de módulos
-│   ├── back-button-handler.js  # Manejo del boton back de Android
 │   ├── chat-messages.js        # Manejo de mensajes
 │   ├── chat-participants.js    # Gestión de participantes y grupos
 │   ├── chat-ui.js              # Interfaz de usuario del chat
