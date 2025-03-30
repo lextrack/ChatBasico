@@ -592,6 +592,7 @@ function setupChatPullToRefresh() {
                 }
             }
 
+            window.isExplicitRefresh = true;
             setTimeout(() => {
                 location.reload();
             }, 700);

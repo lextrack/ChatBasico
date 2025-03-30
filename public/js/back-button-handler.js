@@ -262,7 +262,7 @@
     }
 
     function handleBeforeUnload(e) {
-      if (isAuthenticated && !isExplicitExit) {
+      if (isAuthenticated && !isExplicitExit && !window.isExplicitRefresh) { // Modificar esta condición
         e.preventDefault();
         e.returnValue = '';
 
