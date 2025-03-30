@@ -6,6 +6,104 @@ ChatBasico es una aplicación de mensajería web desarrollada con HTML, CSS y Ja
 
 La aplicación sigue una arquitectura modular donde cada componente se encarga de una responsabilidad específica, facilitando el mantenimiento y la extensibilidad del código. La interacción con Firebase para la autenticación y la gestión de datos en tiempo real es central para el funcionamiento de la aplicación.
 
+## Configuración del Proyecto
+
+Para utilizar esta aplicación, es necesario configurar Firebase y actualizar los datos de conexión:
+
+1. **Crear un proyecto en Firebase**:
+   - Accede a [Firebase Console](https://console.firebase.google.com/)
+   - Crea un nuevo proyecto
+   - Habilita Authentication (con email y contraseña)
+   - Configura Realtime Database
+
+2. **Actualizar la configuración**:
+   - Modifica el archivo `public/js/config.js` con tus propias credenciales de Firebase:
+   ```javascript
+   window.firebaseConfig = {
+       apiKey: "TU_API_KEY",
+       authDomain: "TU_PROYECTO.firebaseapp.com",
+       databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
+       projectId: "TU_PROYECTO",
+       storageBucket: "TU_PROYECTO.firebasestorage.app",
+       messagingSenderId: "TU_MESSAGING_ID",
+       appId: "TU_APP_ID",
+       measurementId: "TU_MEASUREMENT_ID"
+   };
+   ```
+
+3. **Configurar Reglas de Seguridad en Firebase**:
+   - En la consola de Firebase, navega a Realtime Database
+   - Ve a la pestaña "Reglas" y utiliza las siguientes reglas de seguridad:
+   ```json
+   {
+     "rules": {
+       ".read": "auth != null",
+       ".write": "auth != null",
+       "users": {
+         ".read": "auth != null",
+         "$uid": {
+           ".write": "auth != null && auth.uid == $uid",
+           "publicKey": {
+             ".read": "auth != null"
+           }
+         }
+       },
+       "userKeys": {
+         ".read": "auth != null",
+         ".write": "auth != null",
+         "$uid": {
+           ".read": "auth != null",
+           ".write": "auth != null && auth.uid == $uid",
+           "publicKey": {
+             ".read": "auth != null"
+           }
+         }
+       },
+       "userChats": {
+         "$uid": {
+           ".read": "auth != null && auth.uid == $uid",
+           ".write": "auth != null && auth.uid == $uid"
+         }
+       },
+       "chats": {
+         ".read": "auth != null",
+         ".write": "auth != null"
+       },
+       "chatParticipants": {
+         "$chatId": {
+           ".read": "auth != null && data.child(auth.uid).exists()",
+           ".write": "auth != null && (data.child(auth.uid).exists() || newData.child(auth.uid).exists())"
+         }
+       },
+       "messages": {
+         "$chatId": {
+           ".read": "auth != null && root.child('chatParticipants').child($chatId).child(auth.uid).exists()",
+           ".write": "auth != null && root.child('chatParticipants').child($chatId).child(auth.uid).exists()",
+           ".indexOn": ["timestamp"]
+         }
+       },
+       "chatKeys": {
+         "$chatId": {
+           ".read": "auth != null && root.child('chatParticipants').child($chatId).child(auth.uid).exists()",
+           ".write": "auth != null && root.child('chatParticipants').child($chatId).child(auth.uid).exists()",
+           "$uid": {
+             ".read": "auth != null && ($uid == auth.uid || root.child('chatParticipants').child($chatId).child(auth.uid).exists())",
+             ".write": "auth != null && root.child('chatParticipants').child($chatId).child(auth.uid).exists()"
+           }
+         }
+       }
+     }
+   }
+   ```
+
+4. **Configuración de Dominio** (opcional):
+- Si deseas restringir el acceso a un dominio específico, configura las restricciones de dominio en la consola de Firebase:
+     - Ve a Project Settings > General
+     - En la sección "Your apps", configura los dominios autorizados
+
+5. **Despliegue**:
+- Puedes desplegar la aplicación usando Firebase Hosting o donde quieras.
+
 ## Estructura del Proyecto
 
 ```
@@ -180,7 +278,7 @@ window.firebaseConfig = {
 };
 ```
 
-Este archivo se genera dinámicamente mediante el script `build.sh` que obtiene los valores de variables de entorno.
+Este archivo se debe modificar con las credenciales específicas de tu proyecto Firebase.
 
 ### 12. `crypto-utils.js`
 
@@ -215,7 +313,6 @@ Este módulo centraliza la inicialización de Firebase y proporciona acceso glob
 
 Gestiona la adaptación de la interfaz a diferentes tamaños de pantalla y dispositivos:
 
-- Ajustes específicos para iOS
 - Gestión del teclado virtual en dispositivos móviles
 - Adaptación de layouts basada en tamaño de pantalla
 - Optimización de scroll y visibilidad de elementos
@@ -242,3 +339,7 @@ Este módulo mejora la experiencia de usuario en dispositivos móviles y asegura
 - **Almacenamiento local seguro:** Las claves privadas nunca salen del dispositivo
 - **Validación de entrada:** Prevención de inyección de código malicioso
 - **Políticas de seguridad:** Implementación de Content Security Policy
+
+## Licencia
+
+Este proyecto está disponible bajo licencia MIT. Consulta el archivo LICENSE para más detalles.
