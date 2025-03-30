@@ -461,6 +461,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 function setupChatPullToRefresh() {
+    window.isManualRefresh = false;
+    
     const state = {
         touchStartY: 0,
         touchEndY: 0,
@@ -584,6 +586,21 @@ function setupChatPullToRefresh() {
             refreshIndicator.style.transform = `translateY(${state.minPullToActivate + (state.refreshThreshold * 0.6)}px)`;
             refreshIndicator.querySelector('.refresh-text').textContent = 'Actualizando...';
             
+            safelyReloadPage();
+        } else {
+            resetPullState();
+        }
+    }
+    
+    function safelyReloadPage() {
+        try {
+            window.isManualRefresh = true;
+            
+            if (window.onbeforeunload) {
+                const originalBeforeUnload = window.onbeforeunload;
+                window.onbeforeunload = null;
+            }
+            
             if (typeof cleanupEverything === 'function') {
                 try {
                     cleanupEverything();
@@ -591,13 +608,37 @@ function setupChatPullToRefresh() {
                     console.log('Error en limpieza:', e);
                 }
             }
+            
+            if (typeof handleBeforeUnload === 'function') {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+            }
+            
+            const noOp = function() {};
+            window.addEventListener('beforeunload', noOp, { capture: true, once: true });
 
-            window.isExplicitRefresh = true;
+            const scrollPos = window.scrollY;
+            
             setTimeout(() => {
-                location.reload();
+                try {
+                    const currentUrl = window.location.href.split('#')[0];
+                    const timeStamp = Date.now();
+                    
+                    if (window.navigation && typeof window.navigation.reload === 'function') {
+                        window.navigation.reload();
+                    } else {
+                        window.location.href = currentUrl + `#refresh_${timeStamp}`;
+                        window.location.reload(true);
+                    }
+                } catch (error) {
+                    console.error('Error en recarga primaria:', error);
+                    
+                    window.location.reload();
+                }
             }, 700);
-        } else {
+        } catch (error) {
+            console.error('Error general en recarga:', error);
             resetPullState();
+            setTimeout(() => window.location.reload(), 1000);
         }
     }
     
@@ -644,6 +685,16 @@ function initPullToRefresh() {
     } else {
         document.addEventListener('DOMContentLoaded', setupChatPullToRefresh);
     }
+}
+
+if (typeof window.handleBeforeUnload === 'function') {
+    const originalHandleBeforeUnload = window.handleBeforeUnload;
+    window.handleBeforeUnload = function(e) {
+        if (window.isManualRefresh) {
+            return;
+        }
+        return originalHandleBeforeUnload(e);
+    };
 }
 
 initPullToRefresh();
