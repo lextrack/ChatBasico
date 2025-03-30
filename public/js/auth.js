@@ -100,7 +100,7 @@ registerForm.addEventListener('submit', async (e) => {
         console.log('Usuario registrado exitosamente con claves de seguridad');
     } catch (error) {
         console.error('Error de registro:', error);
-        registerError.textContent = 'Error al registrarse: ' + error.message;
+        registerError.textContent = "Ocurrio un error al registrarse o no tienes permiso";
         
         submitBtn.textContent = originalBtnText;
         submitBtn.disabled = false;
@@ -152,7 +152,7 @@ loginForm.addEventListener('submit', async (e) => {
         }
     } catch (error) {
         console.error('Error de inicio de sesión:', error);
-        loginError.textContent = "Error: " + (error.message || "Credenciales incorrectas");
+        loginError.textContent = "Credenciales incorrectas o no tienes permiso para acceder";
         
         submitBtn.textContent = originalBtnText;
         submitBtn.disabled = false;
