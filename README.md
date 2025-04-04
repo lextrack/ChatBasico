@@ -1,6 +1,8 @@
 ## Descripción General
 
-ChatBasico es una aplicación de mensajería web desarrollada con HTML, CSS y JavaScript puro (sin frameworks) que se integra con Firebase para proporcionar funcionalidades de chat en tiempo real. La aplicación implementa características avanzadas como autenticación por correo y contraseña, cifrado de extremo a extremo, chats en tiempo real y creación de grupos con hasta 30 usuarios.
+ChatBasico es una aplicación de mensajería web desarrollada con HTML, CSS y JavaScript puro (sin frameworks) que se integra con Firebase para proporcionar funcionalidades de chat en tiempo real. La aplicación implementa algunas características como autenticación por correo y contraseña, cifrado de extremo a extremo, chats en tiempo real y creación de grupos con hasta 30 usuarios. <strong>Aunque todo dependera de como configures Firebase y las modificaciones que hagas al proyecto.</strong>
+
+<img src="./Captures/1.png">
 
 ## Arquitectura del Sistema
 
