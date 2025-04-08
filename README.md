@@ -1,6 +1,6 @@
 ## Descripción General
 
-ChatBasico es una aplicación de mensajería web desarrollada con HTML, CSS y JavaScript puro (sin frameworks) que se integra con Firebase para proporcionar funcionalidades de chat en tiempo real. La aplicación implementa algunas características como autenticación por correo y contraseña, cifrado de extremo a extremo, chats en tiempo real y creación de grupos con hasta 30 usuarios. <strong>Aunque todo dependera de como configures Firebase y las modificaciones que hagas al proyecto.</strong>
+ChatBasico es una aplicación de mensajería web basada en grupos de participantes desarrollada con HTML, CSS y JavaScript puro (sin frameworks) que se integra con Firebase para proporcionar funcionalidades de chat en tiempo real. La aplicación implementa algunas características como autenticación por correo y contraseña, cifrado de extremo a extremo, chats en tiempo real y creación de grupos con hasta 30 usuarios. <strong>Aunque todo dependera de como configures Firebase y las modificaciones que hagas al proyecto.</strong>
 
 <img src="./captures/1.png">
 
@@ -133,7 +133,7 @@ Para utilizar esta aplicación, es necesario configurar Firebase y actualizar lo
 
 ### 1. `app.js`
 
-Este archivo es el punto de inicialización de la aplicación. Se encarga de verificar que Firebase se haya cargado correctamente y prepara el entorno para la ejecución de la aplicación.
+Este archivo es el punto de inicialización de la aplicación. Se encarga de verificar que Firebase se haya cargado correctamente y prepara el entorno para la ejecución de la aplicación. Además de mostrar estados de conexión al usuario.
 
 ```javascript
 document.addEventListener('DOMContentLoaded', () => {
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 Gestiona toda la lógica de autenticación de usuarios, incluyendo:
 
-- Registro de nuevos usuarios con email y contraseña
+- Registro de nuevos usuarios con email y contraseña (pueden ser falsos)
 - Inicio de sesión de usuarios existentes
 - Generación y almacenamiento seguro de claves criptográficas por usuario
 - Cierre de sesión y limpieza de datos locales
@@ -179,7 +179,6 @@ Proporciona una interfaz para interactuar con el sistema de cifrado de extremo a
 - Inicialización del sistema de cifrado
 - Gestión de claves de usuario y claves de chat
 - Encriptación y desencriptación de mensajes
-- Compartición segura de claves entre usuarios
 - Verificación de compatibilidad del navegador con Web Crypto API
 
 Este módulo se integra con `crypto-utils.js` para realizar las operaciones criptográficas efectivas, actuando como un adaptador que simplifica su uso en el contexto del chat.
