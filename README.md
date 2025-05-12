@@ -99,9 +99,12 @@ Para utilizar esta aplicación, es necesario configurar Firebase y actualizar lo
    ```
 
 4. **Configuración de Dominio** (opcional):
-- Si deseas restringir el acceso a un dominio específico, configura las restricciones de dominio en la consola de Firebase:
-     - Ve a Project Settings > General
-     - En la sección "Your apps", configura los dominios autorizados
+- Si deseas restringir el acceso a un dominio específico, configura las restricciones de dominio en Google Cloud:
+     - Ingresa a Google Cloud con la cuenta que tienes en Firebase
+     - Ve a APIs y Servicios
+     - Ve a Credenciales
+     - Cuando son proyectos web Firebase suele crear una Clave API con un nombre asi: Browser key (auto created by Firebase)
+     - En Restricciones de aplicaciones selecciona la opción Sitios web y agrega los enlaces de los dominos que quieres permite que funcionen bajo tu api key de firebase
 
 5. **Despliegue**:
 - Puedes desplegar la aplicación usando Firebase Hosting o donde quieras.
